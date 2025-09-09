@@ -1,0 +1,51 @@
+stages:
+  - build
+  - test
+  - docker
+  - deploy
+  - selenium
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - echo "Starting GitLab CI pipeline..."
+
+build_java:
+  stage: build
+  script:
+    - cd java-app
+    - mvn clean package
+  artifacts:
+    paths:
+      - java-app/target/
+
+build_python:
+  stage: build
+  script:
+    - cd python-ai-service
+    - pip install -r requirements.txt
+
+unit_tests:
+  stage: test
+  script:
+    - echo "Run unit tests here..."
+
+docker_build_and_push:
+  stage: docker
+  script:
+    - docker build -t $CI_REGISTRY/java-app:latest java-app/
+    - docker build -t $CI_REGISTRY/python-ai-service:latest python-ai-service/
+    # Add docker login and push commands
+
+deploy_k8s:
+  stage: deploy
+  script:
+    - kubectl apply -f kubernetes/
+
+run_selenium:
+  stage: selenium
+  script:
+    - cd selenium-tests
+    - pip install -r requirements.txt
+    - python test_login.py
