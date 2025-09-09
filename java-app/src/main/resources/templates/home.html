@@ -1,10 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Home - Sentiment WebApp</title>
+    <meta charset="UTF-8">
+    <title>Sentiment Analysis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 2px 8px #ccc; }
+        label, input, button { display: block; width: 100%; margin-bottom: 15px; }
+        input[type="text"] { padding: 8px; }
+        .result { margin-top: 20px; font-size: 1.2em; }
+        table { width: 100%; margin-top: 30px; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background: #f0f0f0; }
+    </style>
 </head>
 <body>
-    <h2>Welcome to Sentiment WebApp!</h2>
-    <a th:href="@{/login}">Login</a>
+    <div class="container">
+        <h2>Sentiment Analysis</h2>
+        <form th:action="@{/analyze}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <label for="text">Enter text:</label>
+            <input type="text" id="text" name="text" th:value="${text}" required />
+            <button type="submit">Analyze</button>
+        </form>
+        <div class="result" th:if="${sentiment}">
+            <strong>Sentiment:</strong> <span th:text="${sentiment}"></span>
+        </div>
+        <div th:if="${history != null and #lists.size(history) > 0}">
+            <h3>Analysis History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Text</th>
+                        <th>Sentiment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="h : ${history}">
+                        <td th:text="${#dates.format(h.analyzedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${h.text}"></td>
+                        <td th:text="${h.sentiment}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
